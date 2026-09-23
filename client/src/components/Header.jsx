@@ -28,8 +28,8 @@ export default function Header({
         </div>
         <div className="brand-titles">
           <h1>
-            Moon School
-            <span className="school-badge">SAFE APP</span>
+            Lake Norman Charter
+            {/* <span className="school-badge">SAFE APP</span> */}
           </h1>
           <p>Safe Students, Bright Futures</p>
         </div>

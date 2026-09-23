@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import MorningDropOff from "./pages/MorningDropOff";
@@ -16,6 +16,17 @@ import NotificationsModal from "./pages/NotificationModal";
 import { STUDENTS, PARENT_USER, INITIAL_ACTIVITY_LOGS } from "./data/mocData";
 import Home from "./pages/Home";
 
+const formatLiveDateTime = (date = new Date()) => {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+};
+
 export default function App() {
   // Navigation & Child Selection
   const [activeTab, setActiveTab] = useState("home");
@@ -24,14 +35,14 @@ export default function App() {
 
   // Scenario Simulation
   const [currentScenario, setCurrentScenario] = useState("morning_regular");
-  const [currentTime, setCurrentTime] = useState("8:02 AM");
+  const [currentTime, setCurrentTime] = useState(() => formatLiveDateTime());
   const [isLateMorning, setIsLateMorning] = useState(false);
   const [isLateAfternoon, setIsLateAfternoon] = useState(false);
   // const [lateFeeMinutes, setLateFeeMinutes] = useState(0);
   const [lateFeeTotal, setLateFeeTotal] = useState(0);
 
   // Process States
-  const [dropOffStatus, setDropOffStatus] = useState("in_progress"); // 'in_progress' | 'confirmed' | 'late_checked_in'
+  const [dropOffStatus, setDropOffStatus] = useState("confirmed"); // 'in_progress' | 'confirmed' | 'late_checked_in'
   const [pickUpStatus, setPickUpStatus] = useState("not_checked_in"); // 'not_checked_in' | 'in_queue' | 'pole_assigned' | 'completed'
 
   // Modals
@@ -45,6 +56,14 @@ export default function App() {
   // Activity Logs
   const [activityLogs, setActivityLogs] = useState(INITIAL_ACTIVITY_LOGS);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(formatLiveDateTime());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const student =
     STUDENTS.find((s) => s.id === selectedStudentId) || STUDENTS[0];
 
@@ -57,7 +76,7 @@ export default function App() {
         setCurrentTime("8:02 AM");
         setIsLateMorning(false);
         setIsLateAfternoon(false);
-        setDropOffStatus("in_progress");
+        setDropOffStatus("confirmed");
         setPickUpStatus("not_checked_in");
         setLateFeeMinutes(0);
         setLateFeeTotal(0);
@@ -69,7 +88,7 @@ export default function App() {
         setCurrentTime("8:35 AM");
         setIsLateMorning(true);
         setIsLateAfternoon(false);
-        setDropOffStatus("in_progress");
+        setDropOffStatus("confirmed");
         setPickUpStatus("not_checked_in");
         setLateFeeMinutes(0);
         setLateFeeTotal(0);

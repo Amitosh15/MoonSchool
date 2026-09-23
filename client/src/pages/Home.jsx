@@ -42,11 +42,13 @@ export default function Home({
     });
   }, [currentTime, dropOffStatus, pickUpStatus]);
 
+  // Drop-off status
   const dropOffConfirmed =
     statusOverrides.dropOff !== null
       ? statusOverrides.dropOff === "confirm"
       : dropOffStatus === "confirmed" || dropOffStatus === "late_checked_in";
 
+  // Pick-up status
   const pickUpConfirmed =
     statusOverrides.pickUp !== null
       ? statusOverrides.pickUp === "confirm"
@@ -55,11 +57,7 @@ export default function Home({
   const atSchoolConfirmed =
     statusOverrides.atSchool !== null
       ? statusOverrides.atSchool === "confirm"
-      : dropOffConfirmed && !pickUpConfirmed
-        ? true
-        : pickUpConfirmed
-          ? true
-          : false;
+      : false;
 
   const dropOffState = dropOffConfirmed ? "confirm" : "pending";
   const atSchoolState = atSchoolConfirmed ? "confirm" : "pending";
