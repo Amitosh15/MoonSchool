@@ -707,222 +707,6 @@ export default function Home({
         </div>
       </div>
 
-      {/* Main Process Schedule & Live Status Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "18px",
-        }}
-      >
-        {/* Morning Card */}
-        <div className="ms-card" style={{ borderTop: "4px solid #0284c7" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.72rem",
-                textTransform: "uppercase",
-                color: "#0284c7",
-                fontWeight: 800,
-              }}
-            >
-              Morning Session
-            </span>
-            <span className="badge-tag badge-room">8:05 – 8:30 AM</span>
-          </div>
-          <h3
-            style={{
-              fontFamily: "Outfit",
-              fontSize: "1.25rem",
-              fontWeight: 800,
-              color: "#091e32",
-            }}
-          >
-            Morning Drop-Off
-          </h3>
-          <p style={{ fontSize: "0.82rem", color: "#64748b" }}>
-            Capture Student ID, vehicle type, and GPS Lane 1–3 before gate
-            closes at 8:30 AM.
-          </p>
-          <div
-            style={{
-              background: "#f8fafc",
-              padding: "10px",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "0.82rem",
-            }}
-          >
-            <span style={{ color: "#64748b" }}>Current State:</span>
-            <span
-              style={{
-                fontWeight: 800,
-                color: dropOffStatus === "confirmed" ? "#059669" : "#0284c7",
-              }}
-            >
-              {dropOffStatus === "confirmed"
-                ? "✓ Completed"
-                : "Ready for Drop-Off"}
-            </span>
-          </div>
-          <button
-            className="btn-primary-confirm"
-            style={{ padding: "10px", fontSize: "0.88rem" }}
-            onClick={() => onNavigate("dropoff")}
-          >
-            <span>Open Drop-Off Screen</span>
-            <ChevronRight size={16} />
-          </button>
-        </div>
-
-        {/* Afternoon Card */}
-        <div className="ms-card" style={{ borderTop: "4px solid #f59e0b" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.72rem",
-                textTransform: "uppercase",
-                color: "#d97706",
-                fontWeight: 800,
-              }}
-            >
-              Afternoon Dismissal
-            </span>
-            <span className="badge-tag badge-room">3:30 – 4:00 PM</span>
-          </div>
-          <h3
-            style={{
-              fontFamily: "Outfit",
-              fontSize: "1.25rem",
-              fontWeight: 800,
-              color: "#091e32",
-            }}
-          >
-            Afternoon Pick-Up
-          </h3>
-          <p style={{ fontSize: "0.82rem", color: "#64748b" }}>
-            Queue check-in, Poles 1–14 curbside staging, and $1/min late fee
-            tracker after 4:00 PM.
-          </p>
-          <div
-            style={{
-              background: "#f8fafc",
-              padding: "10px",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "0.82rem",
-            }}
-          >
-            <span style={{ color: "#64748b" }}>Current State:</span>
-            <span
-              style={{
-                fontWeight: 800,
-                color: pickUpStatus === "completed" ? "#059669" : "#d97706",
-              }}
-            >
-              {pickUpStatus === "completed"
-                ? "✓ Released"
-                : pickUpStatus === "not_checked_in"
-                  ? "Queueing Closed"
-                  : "Staged at Pole 7"}
-            </span>
-          </div>
-          <button
-            className="btn-primary-confirm"
-            style={{
-              padding: "10px",
-              fontSize: "0.88rem",
-              background: "linear-gradient(135deg, #091e32, #134074)",
-            }}
-            onClick={() => onNavigate("pickup")}
-          >
-            <span>Open Pick-Up Screen</span>
-            <ChevronRight size={16} />
-          </button>
-        </div>
-
-        {/* Safety & Vehicle Card */}
-        <div className="ms-card" style={{ borderTop: "4px solid #00a896" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.72rem",
-                textTransform: "uppercase",
-                color: "#00a896",
-                fontWeight: 800,
-              }}
-            >
-              Identification Pass
-            </span>
-            <span className="badge-tag badge-id">TAG {student.carTag}</span>
-          </div>
-          <h3
-            style={{
-              fontFamily: "Outfit",
-              fontSize: "1.25rem",
-              fontWeight: 800,
-              color: "#091e32",
-            }}
-          >
-            Digital Car Tag QR
-          </h3>
-          <p style={{ fontSize: "0.82rem", color: "#64748b" }}>
-            Dual-sided windshield/rear view tag for teacher QR scanning &
-            verified student release.
-          </p>
-          <div
-            style={{
-              background: "#f8fafc",
-              padding: "10px",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "0.82rem",
-            }}
-          >
-            <span style={{ color: "#64748b" }}>Vehicle Registered:</span>
-            <span style={{ fontWeight: 800, color: "#091e32" }}>
-              {parentUser.vehicle.split("(")[0]}
-            </span>
-          </div>
-          <button
-            className="btn-primary-confirm"
-            style={{
-              padding: "10px",
-              fontSize: "0.88rem",
-              background: "linear-gradient(135deg, #00a896, #028090)",
-            }}
-            onClick={onOpenCarTag}
-          >
-            <span>View Dual-Sided Tag</span>
-            <QrCode size={16} />
-          </button>
-        </div>
-      </div>
-
       {/* Two-part lower section: Process Workflow Map + Children overview */}
       <div
         style={{
@@ -971,7 +755,7 @@ export default function Home({
                   Active Transportation Overview
                 </h3>
               </div>
-              <span
+              {/* <span
                 style={{
                   fontSize: "0.72rem",
                   fontWeight: 800,
@@ -992,8 +776,8 @@ export default function Home({
                     background: "#10b981",
                   }}
                 />
-                Live Gate Active
-              </span>
+                Live Gate Closed
+              </span> */}
             </div>
             <p style={{ fontSize: "0.82rem", color: "#64748b", margin: 0 }}>
               Tracking student status for <strong>{student.name}</strong> (
@@ -1025,7 +809,7 @@ export default function Home({
                   textTransform: "uppercase",
                 }}
               >
-                Morning Gate Window
+                Morning Drop-off
               </div>
               <div
                 style={{
@@ -1065,7 +849,7 @@ export default function Home({
                   textTransform: "uppercase",
                 }}
               >
-                Afternoon Curbside
+                Afternoon Pick-up
               </div>
               <div
                 style={{

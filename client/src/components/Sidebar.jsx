@@ -36,6 +36,7 @@ export default function Sidebar({
       icon: ArrowUpFromLine,
       badge: "3:30–4:00 PM",
     },
+    { id: "children", label: "My Children", icon: Users, count: "2" },
     { id: "bus", label: "Bus GPS Tracking", icon: Bus, badge: "Live" },
     { id: "history", label: "Activity History", icon: History },
     {
@@ -44,7 +45,6 @@ export default function Sidebar({
       icon: CreditCard,
       alert: lateFeeTotal > 0 ? `$${lateFeeTotal}` : null,
     },
-    { id: "children", label: "My Children", icon: Users, count: "2" },
     { id: "help", label: "Help & Safety Policy", icon: HelpCircle },
   ];
 

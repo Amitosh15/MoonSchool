@@ -2,7 +2,7 @@
 export const STUDENTS = [
   {
     id: "MS-001",
-    name: "Ama Safranie",
+    name: "Ama",
     grade: "Grade 2",
     homeroom: "Gr. 2A",
     teacher: "Ms. Higgins",
@@ -15,7 +15,7 @@ export const STUDENTS = [
   },
   {
     id: "MS-002",
-    name: "Kwame Safranie",
+    name: "Kwame",
     grade: "Grade 4",
     homeroom: "Gr. 4B",
     teacher: "Mr. Adams",
@@ -29,9 +29,9 @@ export const STUDENTS = [
 ];
 
 export const PARENT_USER = {
-  name: "John Agyeman",
+  name: "John",
   phone: "704-555-1234",
-  email: "john.agyeman@example.com",
+  email: "john@example.com",
   relation: "Father / Legal Guardian",
   carTag: "MS-001",
   vehicle: "Toyota Highlander (Gray)",
@@ -40,7 +40,7 @@ export const PARENT_USER = {
   authorizedPickups: [
     {
       id: 1,
-      name: "John Agyeman",
+      name: "John",
       relation: "Father (Primary)",
       phone: "704-555-1234",
       verified: true,
@@ -48,7 +48,7 @@ export const PARENT_USER = {
     },
     {
       id: 2,
-      name: "Grace Safranie",
+      name: "Grace ",
       relation: "Mother",
       phone: "704-555-5678",
       verified: true,
@@ -56,7 +56,7 @@ export const PARENT_USER = {
     },
     {
       id: 3,
-      name: "Beatrice Osei",
+      name: "Beatrice",
       relation: "Authorized Caregiver / Nanny",
       phone: "704-555-9012",
       verified: true,

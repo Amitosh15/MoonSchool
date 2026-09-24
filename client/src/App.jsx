@@ -1,4 +1,11 @@
 import React, { useState, useEffect } from "react";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import MorningDropOff from "./pages/MorningDropOff";
@@ -15,6 +22,7 @@ import NotificationsModal from "./pages/NotificationModal";
 
 import { STUDENTS, PARENT_USER, INITIAL_ACTIVITY_LOGS } from "./data/mocData";
 import Home from "./pages/Home";
+import AuthPortal from "./pages/auth/AuthPortal";
 
 const formatLiveDateTime = (date = new Date()) => {
   return new Intl.DateTimeFormat("en-US", {
@@ -28,6 +36,13 @@ const formatLiveDateTime = (date = new Date()) => {
 };
 
 export default function App() {
+  const navigate = useNavigate();
+
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [parentUser, setParentUser] = useState(PARENT_USER);
+  const [studentsList, setStudentsList] = useState(STUDENTS);
+
   // Navigation & Child Selection
   const [activeTab, setActiveTab] = useState("home");
   const [selectedStudentId, setSelectedStudentId] = useState("MS-001");
@@ -38,7 +53,7 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(() => formatLiveDateTime());
   const [isLateMorning, setIsLateMorning] = useState(false);
   const [isLateAfternoon, setIsLateAfternoon] = useState(false);
-  // const [lateFeeMinutes, setLateFeeMinutes] = useState(0);
+  const [lateFeeMinutes, setLateFeeMinutes] = useState(0);
   const [lateFeeTotal, setLateFeeTotal] = useState(0);
 
   // Process States
@@ -67,6 +82,28 @@ export default function App() {
   const student =
     STUDENTS.find((s) => s.id === selectedStudentId) || STUDENTS[0];
 
+  // Auth Handlers
+  const handleLoginSuccess = (user) => {
+    setParentUser(user);
+    setIsAuthenticated(true);
+    navigate("/dashboard/dropoff");
+  };
+
+  const handleSignupSuccess = (newUser, newStudents) => {
+    setParentUser(newUser);
+    if (newStudents && newStudents.length > 0) {
+      setStudentsList((prev) => [...newStudents, ...prev]);
+      setSelectedStudentId(newStudents[0].id);
+    }
+    setIsAuthenticated(true);
+    navigate("/dashboard/dropoff");
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    navigate("/login");
+  };
+
   // Scenario Switcher Logic
   const handleSelectScenario = (scenarioKey) => {
     setCurrentScenario(scenarioKey);
@@ -76,24 +113,24 @@ export default function App() {
         setCurrentTime("8:02 AM");
         setIsLateMorning(false);
         setIsLateAfternoon(false);
-        setDropOffStatus("confirmed");
+        setDropOffStatus("in_progress");
         setPickUpStatus("not_checked_in");
         setLateFeeMinutes(0);
         setLateFeeTotal(0);
         setSelectedLane(2);
-        setActiveTab("dropoff");
+        navigate("/dashboard/dropoff");
         break;
 
       case "morning_late":
         setCurrentTime("8:35 AM");
         setIsLateMorning(true);
         setIsLateAfternoon(false);
-        setDropOffStatus("confirmed");
+        setDropOffStatus("in_progress");
         setPickUpStatus("not_checked_in");
         setLateFeeMinutes(0);
         setLateFeeTotal(0);
         setSelectedLane(1);
-        setActiveTab("dropoff");
+        navigate("/dashboard/dropoff");
         break;
 
       case "afternoon_queue":
@@ -105,7 +142,7 @@ export default function App() {
         setLateFeeMinutes(0);
         setLateFeeTotal(0);
         setSelectedLane(3);
-        setActiveTab("pickup");
+        navigate("/dashboard/pickup");
         break;
 
       case "afternoon_open":
@@ -117,7 +154,7 @@ export default function App() {
         setLateFeeMinutes(0);
         setLateFeeTotal(0);
         setSelectedLane(3);
-        setActiveTab("pickup");
+        navigate("/dashboard/pickup");
         break;
 
       case "afternoon_late":
@@ -129,7 +166,7 @@ export default function App() {
         setLateFeeMinutes(8);
         setLateFeeTotal(8);
         setSelectedLane(3);
-        setActiveTab("pickup");
+        navigate("/dashboard/pickup");
         break;
 
       default:
@@ -200,207 +237,212 @@ export default function App() {
     setActivityLogs([newLog, ...activityLogs]);
   };
 
-  return (
-    <div className="app-container">
-      {/* Top Header with Brand, Clock, and Scenario Switcher */}
-      <Header
-        currentScenario={currentScenario}
-        onSelectScenario={handleSelectScenario}
-        currentTime={currentTime}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        unreadNotifications={unreadNotifications}
-        onOpenNotifications={() => {
-          setIsNotificationsOpen(true);
-          setUnreadNotifications(0);
-        }}
-        parentUser={PARENT_USER}
-      />
+  // Dashboard component that syncs active tab with URL
+  const DashboardLayout = () => {
+    const { tabParam } = useParams();
+    const activeTab = tabParam || "dropoff";
 
-      {/* Quick Scenario Bar directly under header */}
-      {/* <div className="scenario-bar">
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span
-            style={{
-              fontWeight: 800,
-              color: "#f4a261",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}
-          >
-            System Time & Stage:
-          </span>
-          <span style={{ color: "#cbd5e1" }}>
-            Select scenario to preview each workflow:
-          </span>
-        </div>
-        <div className="scenario-buttons-group">
-          <button
-            className={`scenario-chip ${currentScenario === "morning_regular" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("morning_regular")}
-          >
-            <span>☀️ Morning On-Time (8:02 AM)</span>
-          </button>
-          <button
-            className={`scenario-chip ${currentScenario === "morning_late" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("morning_late")}
-          >
-            <span>⚠️ Morning Late (8:35 AM)</span>
-          </button>
-          <button
-            className={`scenario-chip ${currentScenario === "afternoon_queue" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("afternoon_queue")}
-          >
-            <span>🚗 Afternoon Queue (3:15 PM)</span>
-          </button>
-          <button
-            className={`scenario-chip ${currentScenario === "afternoon_open" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("afternoon_open")}
-          >
-            <span>🏁 Gate Open & Pole 7 (3:35 PM)</span>
-          </button>
-          <button
-            className={`scenario-chip late ${currentScenario === "afternoon_late" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("afternoon_late")}
-          >
-            <span>🚨 Late Fee $1/min (4:08 PM)</span>
-          </button>
-        </div>
-      </div> */}
+    const handleTabChange = (tab) => {
+      navigate(`/dashboard/${tab}`);
+    };
 
-      <div className="main-body">
-        {/* Navigation Sidebar */}
-        <Sidebar
+    return (
+      <div className="app-container">
+        {/* Top Header with Brand, Clock, and Scenario Switcher */}
+        <Header
+          currentScenario={currentScenario}
+          onSelectScenario={handleSelectScenario}
+          currentTime={currentTime}
           activeTab={activeTab}
-          setActiveTab={(tab) => {
-            if (tab === "bus") {
-              setIsBusTrackingOpen(true);
-            } else if (tab === "payments") {
-              setIsPaymentsOpen(true);
-            } else {
-              setActiveTab(tab);
-            }
+          setActiveTab={handleTabChange}
+          unreadNotifications={unreadNotifications}
+          onOpenNotifications={() => {
+            setIsNotificationsOpen(true);
+            setUnreadNotifications(0);
           }}
-          onOpenCarTag={() => setIsCarTagOpen(true)}
-          onOpenTeacherScan={() => setIsTeacherScanOpen(true)}
-          lateFeeTotal={lateFeeTotal}
-          student={student}
+          parentUser={parentUser}
+          onLogout={handleLogout}
+          onOpenAuth={() => navigate("/login")}
         />
 
-        {/* Content Area */}
-        <main className="content-area">
-          {activeTab === "home" && (
-            <Home
-              student={student}
-              parentUser={PARENT_USER}
-              currentTime={currentTime}
-              onNavigate={(tab) => {
-                if (tab === "bus") setIsBusTrackingOpen(true);
-                else setActiveTab(tab);
+        {/* Quick Scenario Bar directly under header */}
+        {/* <div className="scenario-bar">
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span
+              style={{
+                fontWeight: 800,
+                color: "#f4a261",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
               }}
-              dropOffStatus={dropOffStatus}
-              pickUpStatus={pickUpStatus}
-              onOpenCarTag={() => setIsCarTagOpen(true)}
-              onOpenTeacherScan={() => setIsTeacherScanOpen(true)}
-              lateFeeTotal={lateFeeTotal}
-            />
-          )}
+            >
+              System Time & Stage:
+            </span>
+            <span style={{ color: "#cbd5e1" }}>
+              Select scenario to preview each workflow:
+            </span>
+          </div>
+          <div className="scenario-buttons-group">
+            <button
+              className={`scenario-chip ${currentScenario === "morning_regular" ? "active" : ""}`}
+              onClick={() => handleSelectScenario("morning_regular")}
+            >
+              <span>☀️ Morning On-Time (8:02 AM)</span>
+            </button>
+            <button
+              className={`scenario-chip ${currentScenario === "morning_late" ? "active" : ""}`}
+              onClick={() => handleSelectScenario("morning_late")}
+            >
+              <span>⚠️ Morning Late (8:35 AM)</span>
+            </button>
+            <button
+              className={`scenario-chip ${currentScenario === "afternoon_queue" ? "active" : ""}`}
+              onClick={() => handleSelectScenario("afternoon_queue")}
+            >
+              <span>🚗 Afternoon Queue (3:15 PM)</span>
+            </button>
+            <button
+              className={`scenario-chip ${currentScenario === "afternoon_open" ? "active" : ""}`}
+              onClick={() => handleSelectScenario("afternoon_open")}
+            >
+              <span>🏁 Gate Open & Pole 7 (3:35 PM)</span>
+            </button>
+            <button
+              className={`scenario-chip late ${currentScenario === "afternoon_late" ? "active" : ""}`}
+              onClick={() => handleSelectScenario("afternoon_late")}
+            >
+              <span>🚨 Late Fee $1/min (4:08 PM)</span>
+            </button>
+          </div>
+        </div> */}
 
-          {/* {activeTab === "dropoff" && (
-            <MorningDropOff
-              student={student}
-              studentsList={STUDENTS}
-              onSelectStudent={setSelectedStudentId}
-              parentUser={PARENT_USER}
-              currentTime={currentTime}
-              isLateMorning={isLateMorning}
-              dropOffStatus={dropOffStatus}
-              onConfirmDropOff={handleConfirmDropOff}
-              onCheckInLate={handleCheckInLate}
-              onOpenCarTag={() => setIsCarTagOpen(true)}
-              selectedLane={selectedLane}
-              setSelectedLane={setSelectedLane}
-            />
-          )} */}
+        <div className="main-body">
+          {/* Navigation Sidebar */}
+          <Sidebar
+            activeTab={activeTab}
+            setActiveTab={handleTabChange}
+            onOpenCarTag={() => setIsCarTagOpen(true)}
+            lateFeeTotal={lateFeeTotal}
+            student={student}
+          />
 
-          {/* {activeTab === "pickup" && (
-            <AfternoonPickUp
-              student={student}
-              studentsList={STUDENTS}
-              onSelectStudent={setSelectedStudentId}
-              parentUser={PARENT_USER}
-              currentTime={currentTime}
-              isLateAfternoon={isLateAfternoon}
-              pickUpStatus={pickUpStatus}
-              onCheckInPickUp={handleCheckInPickUp}
-              onConfirmPickUp={handleConfirmPickUp}
-              onOpenCarTag={() => setIsCarTagOpen(true)}
-              onOpenTeacherScan={() => setIsTeacherScanOpen(true)}
-              lateFeeMinutes={lateFeeMinutes}
-              lateFeeTotal={lateFeeTotal}
-              selectedLane={selectedLane}
-              setSelectedLane={setSelectedLane}
-            />
-          )} */}
+          {/* Content Area */}
+          <main className="content-area">
+            {activeTab === "home" && (
+              <Home
+                student={student}
+                parentUser={parentUser}
+                currentTime={currentTime}
+                onNavigate={handleTabChange}
+                dropOffStatus={dropOffStatus}
+                pickUpStatus={pickUpStatus}
+                onOpenCarTag={() => setIsCarTagOpen(true)}
+                lateFeeTotal={lateFeeTotal}
+              />
+            )}
 
-          {/* {activeTab === "children" && (
-            <MyChildrenView
-              studentsList={STUDENTS}
-              selectedStudentId={selectedStudentId}
-              onSelectStudent={setSelectedStudentId}
-              parentUser={PARENT_USER}
-              onOpenCarTag={() => setIsCarTagOpen(true)}
-            />
-          )} */}
+            {activeTab === "dropoff" && (
+              <MorningDropOff
+                student={student}
+                studentsList={studentsList}
+                onSelectStudent={setSelectedStudentId}
+                parentUser={parentUser}
+                currentTime={currentTime}
+                isLateMorning={isLateMorning}
+                dropOffStatus={dropOffStatus}
+                onConfirmDropOff={handleConfirmDropOff}
+                onCheckInLate={handleCheckInLate}
+                onOpenCarTag={() => setIsCarTagOpen(true)}
+                selectedLane={selectedLane}
+                setSelectedLane={setSelectedLane}
+              />
+            )}
 
-          {/* {activeTab === "history" && (
-            <ActivityHistory
-              activityLogs={activityLogs}
-              parentUser={PARENT_USER}
-            />
-          )} */}
+            {activeTab === "pickup" && (
+              <AfternoonPickUp
+                student={student}
+                studentsList={studentsList}
+                onSelectStudent={setSelectedStudentId}
+                parentUser={parentUser}
+                currentTime={currentTime}
+                isLateAfternoon={isLateAfternoon}
+                pickUpStatus={pickUpStatus}
+                onCheckInPickUp={handleCheckInPickUp}
+                onConfirmPickUp={handleConfirmPickUp}
+                onOpenCarTag={() => setIsCarTagOpen(true)}
+                lateFeeMinutes={lateFeeMinutes}
+                lateFeeTotal={lateFeeTotal}
+                selectedLane={selectedLane}
+                setSelectedLane={setSelectedLane}
+              />
+            )}
+          </main>
+        </div>
 
-          {/* {activeTab === "help" && (
-            <HelpView onOpenCarTag={() => setIsCarTagOpen(true)} />
-          )} */}
-        </main>
+        {/* Modals */}
+        <CarTagModal
+          isOpen={isCarTagOpen}
+          onClose={() => setIsCarTagOpen(false)}
+          student={student}
+          parentUser={parentUser}
+        />
+
+        <NotificationsModal
+          isOpen={isNotificationsOpen}
+          onClose={() => setIsNotificationsOpen(false)}
+        />
       </div>
+    );
+  };
 
-      {/* Modals */}
-      <CarTagModal
-        isOpen={isCarTagOpen}
-        onClose={() => setIsCarTagOpen(false)}
-        student={student}
-        parentUser={PARENT_USER}
-        onLaunchTeacherScan={() => setIsTeacherScanOpen(true)}
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          <AuthPortal
+            onLoginSuccess={handleLoginSuccess}
+            onSignupSuccess={handleSignupSuccess}
+            onBypassToDashboard={() => {
+              setIsAuthenticated(true);
+              navigate("/dashboard/home");
+            }}
+          />
+        }
       />
-
-      {/* <TeacherScanModal
-        isOpen={isTeacherScanOpen}
-        onClose={() => setIsTeacherScanOpen(false)}
-        student={student}
-        parentUser={PARENT_USER}
-        onStudentReleased={handleConfirmPickUp}
-      /> */}
-
-      {/* <BusTrackingModal
-        isOpen={isBusTrackingOpen}
-        onClose={() => setIsBusTrackingOpen(false)}
-        student={student}
-        parentUser={PARENT_USER}
-      /> */}
-      {/* 
-      <PaymentsModal
-        isOpen={isPaymentsOpen}
-        onClose={() => setIsPaymentsOpen(false)}
-        lateFeeTotal={lateFeeTotal}
-        parentUser={PARENT_USER}
-      />*/}
-
-      <NotificationsModal
-        isOpen={isNotificationsOpen}
-        onClose={() => setIsNotificationsOpen(false)}
+      <Route
+        path="/signup"
+        element={
+          <AuthPortal
+            initialTab="signup"
+            onLoginSuccess={handleLoginSuccess}
+            onSignupSuccess={handleSignupSuccess}
+          />
+        }
       />
-    </div>
+      <Route
+        path="/dashboard"
+        element={<Navigate to="/dashboard/home" replace />}
+      />
+      <Route
+        path="/dashboard/:tabParam"
+        element={
+          isAuthenticated ? (
+            <DashboardLayout />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="*"
+        element={
+          <Navigate
+            to={isAuthenticated ? "/dashboard/home" : "/login"}
+            replace
+          />
+        }
+      />
+    </Routes>
   );
 }
