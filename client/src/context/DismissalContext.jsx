@@ -1,17 +1,51 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { INITIAL_ACTIVITY_LOGS } from "../data/mocData";
 import { useAuth } from "./useAuth";
 
 export const DismissalContext = createContext(null);
 
+// Formats date as date/month/year (DD/MM/YYYY)
+export const formatLiveDate = (date = new Date()) => {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+// Formats time live without seconds (e.g. 06:35 PM)
+export const formatLiveTime = (date = new Date()) => {
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const formattedHours = hours % 12 || 12;
+  const strHours = String(formattedHours).padStart(2, "0");
+  return `${strHours}:${minutes} ${ampm}`;
+};
+
 export function DismissalProvider({ children }) {
   const navigate = useNavigate();
   const { student, parentUser } = useAuth();
 
+  // Live Date (DD/MM/YYYY) & Time (live without seconds)
+  const [currentDate, setCurrentDate] = useState(() => formatLiveDate());
+  const [currentTime, setCurrentTime] = useState(() => formatLiveTime());
+
+  // Continuously update live clock and date
+  useEffect(() => {
+    const updateLiveClock = () => {
+      const now = new Date();
+      setCurrentDate(formatLiveDate(now));
+      setCurrentTime(formatLiveTime(now));
+    };
+
+    updateLiveClock();
+    const timerId = setInterval(updateLiveClock, 1000);
+    return () => clearInterval(timerId);
+  }, []);
+
   // Scenario Simulation
   const [currentScenario, setCurrentScenario] = useState("morning_regular");
-  const [currentTime, setCurrentTime] = useState("8:02 AM");
   const [isLateMorning, setIsLateMorning] = useState(false);
   const [isLateAfternoon, setIsLateAfternoon] = useState(false);
   const [lateFeeMinutes, setLateFeeMinutes] = useState(0);
@@ -25,13 +59,12 @@ export function DismissalProvider({ children }) {
   // Activity Logs
   const [activityLogs, setActivityLogs] = useState(INITIAL_ACTIVITY_LOGS);
 
-  // Scenario Switcher Logic
+  // Scenario Switcher Logic (changes stages without stopping live clock)
   const handleSelectScenario = (scenarioKey) => {
     setCurrentScenario(scenarioKey);
 
     switch (scenarioKey) {
       case "morning_regular":
-        setCurrentTime("8:02 AM");
         setIsLateMorning(false);
         setIsLateAfternoon(false);
         setDropOffStatus("in_progress");
@@ -43,7 +76,6 @@ export function DismissalProvider({ children }) {
         break;
 
       case "morning_late":
-        setCurrentTime("8:35 AM");
         setIsLateMorning(true);
         setIsLateAfternoon(false);
         setDropOffStatus("in_progress");
@@ -55,7 +87,6 @@ export function DismissalProvider({ children }) {
         break;
 
       case "afternoon_queue":
-        setCurrentTime("3:15 PM");
         setIsLateMorning(false);
         setIsLateAfternoon(false);
         setDropOffStatus("confirmed");
@@ -67,7 +98,6 @@ export function DismissalProvider({ children }) {
         break;
 
       case "afternoon_open":
-        setCurrentTime("3:35 PM");
         setIsLateMorning(false);
         setIsLateAfternoon(false);
         setDropOffStatus("confirmed");
@@ -79,7 +109,6 @@ export function DismissalProvider({ children }) {
         break;
 
       case "afternoon_late":
-        setCurrentTime("4:08 PM");
         setIsLateMorning(false);
         setIsLateAfternoon(true);
         setDropOffStatus("confirmed");
@@ -100,7 +129,7 @@ export function DismissalProvider({ children }) {
     setDropOffStatus("confirmed");
     const newLog = {
       id: `ACT-${Date.now().toString().slice(-4)}`,
-      date: "Today, Sept 14, 2026",
+      date: currentDate,
       time: currentTime,
       type: "Morning Drop-Off",
       student: `${student?.name || "Student"} (${student?.id || "ID"})`,
@@ -117,7 +146,7 @@ export function DismissalProvider({ children }) {
     setDropOffStatus("late_checked_in");
     const newLog = {
       id: `ACT-${Date.now().toString().slice(-4)}`,
-      date: "Today, Sept 14, 2026",
+      date: currentDate,
       time: currentTime,
       type: "Late Morning Drop-Off",
       student: `${student?.name || "Student"} (${student?.id || "ID"})`,
@@ -139,7 +168,7 @@ export function DismissalProvider({ children }) {
     setPickUpStatus("completed");
     const newLog = {
       id: `ACT-${Date.now().toString().slice(-4)}`,
-      date: "Today, Sept 14, 2026",
+      date: currentDate,
       time: currentTime,
       type: isLateAfternoon ? "Late Afternoon Pick-Up" : "Afternoon Pick-Up",
       student: `${student?.name || "Student"} (${student?.id || "ID"})`,
@@ -161,6 +190,8 @@ export function DismissalProvider({ children }) {
   const value = {
     currentScenario,
     setCurrentScenario,
+    currentDate,
+    setCurrentDate,
     currentTime,
     setCurrentTime,
     isLateMorning,

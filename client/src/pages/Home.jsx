@@ -20,6 +20,7 @@ export default function Home({
   student,
   parentUser,
   currentTime,
+  currentDate,
   onNavigate,
   dropOffStatus,
   pickUpStatus,
@@ -357,7 +358,10 @@ export default function Home({
             >
               <Clock size={13} color="#0284c7" />
               <span>
-                Timestamp: <strong>{currentTime || "8:02 AM"}</strong>
+                Timestamp:{" "}
+                <strong>
+                  {currentDate ? `${currentDate} • ${currentTime}` : currentTime || "8:02 AM"}
+                </strong>
               </span>
             </div>
           </div>

@@ -25,6 +25,7 @@ export default function MorningDropOff({
   onSelectStudent,
   parentUser,
   currentTime,
+  currentDate,
   isLateMorning,
   dropOffStatus,
   onConfirmDropOff,
@@ -286,7 +287,7 @@ export default function MorningDropOff({
                   fontWeight: 800,
                 }}
               >
-                {currentTime}
+                {currentDate ? `${currentDate} • ${currentTime}` : currentTime}
               </span>
             </div>
 

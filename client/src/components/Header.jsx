@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ShieldCheck,
   Clock,
+  Calendar,
   Bell,
   Sparkles,
   ChevronDown,
@@ -16,6 +17,7 @@ export default function Header({
   currentScenario,
   onSelectScenario,
   currentTime,
+  currentDate,
   activeTab,
   setActiveTab,
   unreadNotifications,
@@ -75,9 +77,16 @@ export default function Header({
       <div className="header-user-section">
         <div
           className="time-display"
-          title="Moon School Simulated System Clock"
+          title="Moon School Live Date and System Clock"
         >
-          <Clock size={16} color="#38bdf8" />
+          {currentDate && (
+            <>
+              <Calendar size={15} color="#38bdf8" />
+              <span>{currentDate}</span>
+              <span style={{ color: "rgba(255, 255, 255, 0.35)", margin: "0 2px" }}>•</span>
+            </>
+          )}
+          <Clock size={15} color="#38bdf8" />
           <span>{currentTime}</span>
         </div>
 

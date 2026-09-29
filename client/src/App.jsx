@@ -65,6 +65,7 @@ function DashboardLayout() {
     useAuth();
   const {
     currentScenario,
+    currentDate,
     currentTime,
     isLateMorning,
     dropOffStatus,
@@ -93,6 +94,7 @@ function DashboardLayout() {
         activeTab={activeTab}
         setActiveTab={handleTabChange}
         currentTime={currentTime}
+        currentDate={currentDate}
         parentUser={parentUser}
         onLogout={logout}
         currentScenario={currentScenario}
@@ -165,6 +167,7 @@ function DashboardLayout() {
               student={student}
               parentUser={parentUser}
               currentTime={currentTime}
+              currentDate={currentDate}
               onNavigate={handleTabChange}
               dropOffStatus={dropOffStatus}
               pickUpStatus={null}
@@ -180,6 +183,7 @@ function DashboardLayout() {
               onSelectStudent={setSelectedStudentId}
               parentUser={parentUser}
               currentTime={currentTime}
+              currentDate={currentDate}
               isLateMorning={isLateMorning}
               dropOffStatus={dropOffStatus}
               onConfirmDropOff={handleConfirmDropOff}
