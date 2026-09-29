@@ -1,17 +1,14 @@
-import React from "react";
 import { ShieldCheck, LogIn, UserPlus } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context";
 import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
 import "./auth.css";
 
-export default function AuthPortal({
-  onLoginSuccess,
-  onSignupSuccess,
-  initialTab,
-}) {
+export default function AuthPortal({ initialTab }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { login, signup } = useAuth();
 
   // If path is /signup or /register, default to signup, otherwise login
   const isSignup =
@@ -61,17 +58,16 @@ export default function AuthPortal({
         {/* Render Active View */}
         {activeTab === "login" ? (
           <LoginForm
-            onSuccess={(user) => {
-              onLoginSuccess(user);
-              navigate("/dashboard");
+            onSuccess={(user, token, students) => {
+              login(user, token, students);
+              navigate("/");
             }}
-            onSwitchToSignup={() => navigate("/signup")}
           />
         ) : (
           <SignupForm
-            onSuccess={(newUser, newStudents) => {
-              onSignupSuccess(newUser, newStudents);
-              navigate("/dashboard");
+            onSuccess={(newUser, newStudents, token) => {
+              signup(newUser, newStudents, token);
+              navigate("/");
             }}
             onSwitchToLogin={() => navigate("/login")}
           />

@@ -1,20 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Mail,
   Lock,
   Eye,
   EyeOff,
   ArrowRight,
-  ShieldCheck,
   AlertCircle,
   KeyRound,
   CheckCircle2,
-  Sparkles,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { PARENT_USER } from "../../data/mocData";
+import api from "../../services/api";
 
-export default function LoginForm({ onSuccess, onSwitchToSignup }) {
+export default function LoginForm({ onSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,12 +22,12 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }) {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotSuccess, setForgotSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
 
     if (!email.trim()) {
-      setErrorMsg("Please enter your registered Parent Email or Parent ID.");
+      setErrorMsg("Please enter your registered parent email.");
       return;
     }
     if (!password) {
@@ -39,26 +36,27 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }) {
     }
 
     setIsLoading(true);
+    try {
+      const response = await api.post("/auth/login", {
+        email: email.trim(),
+        password,
+      });
+      const { user, token, students = [] } = response.data;
 
-    // Simulate authentication check
-    setTimeout(() => {
+      if (!response.data.success || !user || !token) {
+        setErrorMsg(response.data.message || "Login failed. Please try again.");
+        return;
+      }
+
+      onSuccess(user, token, students);
+    } catch (error) {
+      setErrorMsg(
+        error.response?.data?.message ||
+          "Unable to connect to the login service. Please try again.",
+      );
+    } finally {
       setIsLoading(false);
-      // If it matches demo or any valid pattern
-      const loggedUser = {
-        ...PARENT_USER,
-        email: email.includes("@") ? email : PARENT_USER.email,
-        name: email.toLowerCase().includes("john")
-          ? "John Agyeman"
-          : email.split("@")[0] || "Parent Guardian",
-      };
-      onSuccess(loggedUser);
-    }, 750);
-  };
-
-  const handleQuickDemoFill = () => {
-    setEmail(PARENT_USER.email);
-    setPassword("123456");
-    setErrorMsg("");
+    }
   };
 
   const handleSendReset = (e) => {
@@ -90,10 +88,10 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }) {
       )}
 
       <form onSubmit={handleSubmit} noValidate>
-        {/* Email or Parent ID */}
+        {/* Email */}
         <div className="auth-form-group">
           <label className="auth-label">
-            <span>Parent Email or ID</span>
+            <span>Parent Email</span>
             <span className="required">*</span>
           </label>
           <div className="auth-input-wrapper">
@@ -101,7 +99,7 @@ export default function LoginForm({ onSuccess, onSwitchToSignup }) {
             <input
               type="text"
               className="auth-input-field"
-              placeholder="e.g. parent@example.com or PAR-9042"
+              placeholder="parent@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="username"

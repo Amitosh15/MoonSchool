@@ -14,6 +14,7 @@ import {
   MapPin,
   RefreshCw,
 } from "lucide-react";
+import { PARENT_USER, STUDENTS } from "../data/mocData";
 
 export default function Home({
   student,
@@ -26,6 +27,9 @@ export default function Home({
   onOpenTeacherScan,
   lateFeeTotal,
 }) {
+  const safeStudent = student || STUDENTS[0];
+  const safeParentUser = parentUser || PARENT_USER;
+
   // Status overrides for interactive toggling
   const [statusOverrides, setStatusOverrides] = useState({
     dropOff: null,
@@ -123,7 +127,7 @@ export default function Home({
               lineHeight: 1.1,
             }}
           >
-            Welcome back, {parentUser.name.split(" ")[0]}!
+            Welcome back, {safeParentUser?.name?.split(" ")[0] || "there"}!
           </h2>
           <p
             style={{
@@ -174,7 +178,7 @@ export default function Home({
               onClick={onOpenCarTag}
             >
               <QrCode size={16} />
-              <span>Car Tag: {student.carTag}</span>
+              <span>Car Tag: {safeStudent?.carTag || "N/A"}</span>
             </button>
           </div>
         </div>
@@ -215,7 +219,7 @@ export default function Home({
               </div>
               <div>
                 <h3>Student Profile</h3>
-                <p>Registered for Car Tag {student.carTag}</p>
+                <p>Registered for Car Tag {safeStudent?.carTag || "N/A"}</p>
               </div>
             </div>
           </div>
@@ -230,7 +234,10 @@ export default function Home({
             }}
           >
             <img
-              src={student.avatar}
+              src={
+                safeStudent?.avatar ||
+                "https://images.unsplash.com/photo-1544717305-2782549b5136?w=200&auto=format&fit=crop&q=80"
+              }
               alt=""
               style={{
                 width: "68px",
@@ -241,7 +248,7 @@ export default function Home({
             />
             <div>
               <div style={{ fontWeight: 800, color: "#091e32" }}>
-                {student.name}
+                {safeStudent?.name || "Student"}
               </div>
               {/* <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
                 {student.grade} • {student.homeroom} • Teacher:{" "}
@@ -280,7 +287,7 @@ export default function Home({
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span style={{ color: "#64748b" }}>Registered Vehical:</span>
               <span style={{ fontWeight: 700, color: "#091e32" }}>
-                {parentUser.vehicle}
+                {safeParentUser?.vehicle || "N/A"}
               </span>
             </div>
           </div>
@@ -780,9 +787,11 @@ export default function Home({
               </span> */}
             </div>
             <p style={{ fontSize: "0.82rem", color: "#64748b", margin: 0 }}>
-              Tracking student status for <strong>{student.name}</strong> (
-              {student.grade} • {student.homeroom}) with Car Tag{" "}
-              <strong>{student.carTag}</strong>.
+              Tracking student status for{" "}
+              <strong>{safeStudent?.name || "Student"}</strong> (
+              {safeStudent?.grade || "Grade"} •{" "}
+              {safeStudent?.homeroom || "Homeroom"}) with Car Tag{" "}
+              <strong>{safeStudent?.carTag || "N/A"}</strong>.
             </p>
           </div>
 
@@ -871,7 +880,7 @@ export default function Home({
               >
                 {pickUpConfirmed
                   ? "✓ Released"
-                  : `Pole #${student.assignedPole || 7}`}
+                  : `Pole #${safeStudent?.assignedPole || 7}`}
               </div>
             </div>
           </div>

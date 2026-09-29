@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ShieldCheck,
   Clock,
@@ -7,6 +8,8 @@ import {
   ChevronDown,
   CheckCircle2,
   AlertTriangle,
+  LogOut,
+  KeyRound,
 } from "lucide-react";
 
 export default function Header({
@@ -18,7 +21,11 @@ export default function Header({
   unreadNotifications,
   onOpenNotifications,
   parentUser,
+  onLogout,
+  onOpenAuth,
 }) {
+  const navigate = useNavigate();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   return (
     <header className="top-header">
       {/* Brand Section */}
@@ -84,18 +91,148 @@ export default function Header({
           {unreadNotifications > 0 && <span className="badge-dot" />}
         </button>
 
-        {/* User Profile */}
-        <div className="user-profile-pill">
-          <div className="user-avatar-circle">
-            {parentUser.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")}
+        {/* User Profile Pill with Dropdown / Logout */}
+        <div style={{ position: "relative" }}>
+          <div
+            className="user-profile-pill"
+            style={{ cursor: "pointer", transition: "background 0.2s ease" }}
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            title="Click to view parent account menu"
+          >
+            <div className="user-avatar-circle">
+              {parentUser?.name
+                ? parentUser.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .slice(0, 2)
+                    .join("")
+                : "P"}
+            </div>
+            <div className="user-name-role">
+              <span>{parentUser?.name || "Parent Guardian"}</span>
+              <span>{parentUser?.relation || "Guardian"}</span>
+            </div>
+            <ChevronDown
+              size={14}
+              style={{ color: "#94a3b8", marginLeft: "4px" }}
+            />
           </div>
-          <div className="user-name-role">
-            <span>{parentUser.name}</span>
-            <span>{parentUser.relation}</span>
-          </div>
+
+          {/* Profile Dropdown Menu */}
+          {showProfileMenu && (
+            <div
+              style={{
+                position: "absolute",
+                top: "calc(100% + 8px)",
+                right: 0,
+                width: "240px",
+                background: "#091e32",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: "14px",
+                padding: "12px",
+                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
+                zIndex: 100,
+                backdropFilter: "blur(16px)",
+              }}
+            >
+              <div
+                style={{
+                  padding: "4px 8px 10px",
+                  borderBottom: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "0.86rem",
+                    fontWeight: 700,
+                    color: "#ffffff",
+                  }}
+                >
+                  {parentUser?.name}
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.74rem",
+                    color: "#94a3b8",
+                    wordBreak: "break-all",
+                  }}
+                >
+                  {parentUser?.email || "parent@example.com"}
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.72rem",
+                    color: "#00a896",
+                    marginTop: "2px",
+                    fontWeight: 600,
+                  }}
+                >
+                  Vehicle: {parentUser?.vehicle || "Registered"}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: "8px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "4px",
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    if (onOpenAuth) onOpenAuth();
+                    navigate("/login");
+                  }}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "8px 10px",
+                    fontSize: "0.82rem",
+                    color: "#cbd5e1",
+                    borderRadius: "8px",
+                    textAlign: "left",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.target.style.background = "rgba(255,255,255,0.08)")
+                  }
+                  onMouseLeave={(e) => (e.target.style.background = "none")}
+                >
+                  <KeyRound size={16} color="#38bdf8" />
+                  <span>View Auth / Sign In Page</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    if (onLogout) onLogout();
+                    navigate("/login");
+                  }}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "8px 10px",
+                    fontSize: "0.82rem",
+                    color: "#f43f5e",
+                    borderRadius: "8px",
+                    textAlign: "left",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.target.style.background = "rgba(244,63,94,0.12)")
+                  }
+                  onMouseLeave={(e) => (e.target.style.background = "none")}
+                >
+                  <LogOut size={16} />
+                  <span>Sign Out of Portal</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>
