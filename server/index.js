@@ -18,9 +18,26 @@ const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 // Configure middleware
+const allowedOrigins = [
+  CLIENT_URL,
+  CLIENT_URL.replace(/\/$/, ""),
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+];
+
 app.use(
   cors({
-    origin: [CLIENT_URL, "http://localhost:5173", "http://127.0.0.1:5173"],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true); // Permissive fallback for deployment environments
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

@@ -38,13 +38,31 @@ function HelpView() {
   );
 }
 
+// Protected Route component: Redirects unauthenticated users to /login
+function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
+// Root redirect: Send authenticated users to /dashboard/home, unauthenticated to /login
+function RootRedirect() {
+  const { isAuthenticated } = useAuth();
+  return (
+    <Navigate to={isAuthenticated ? "/dashboard/home" : "/login"} replace />
+  );
+}
+
 // Dashboard layout component that syncs active tab with URL and context
 function DashboardLayout() {
   const { tabParam } = useParams();
   const navigate = useNavigate();
-  const activeTab = tabParam || "dropoff";
+  const activeTab = tabParam || "home";
 
-  const { student, studentsList, setSelectedStudentId, parentUser } = useAuth();
+  const { student, studentsList, setSelectedStudentId, parentUser, logout } =
+    useAuth();
   const {
     currentScenario,
     currentTime,
@@ -71,7 +89,15 @@ function DashboardLayout() {
   return (
     <div className="app-container">
       {/* Top Header with Brand, Clock, and Scenario Switcher */}
-      <Header activeTab={activeTab} setActiveTab={handleTabChange} />
+      <Header
+        activeTab={activeTab}
+        setActiveTab={handleTabChange}
+        currentTime={currentTime}
+        parentUser={parentUser}
+        onLogout={logout}
+        currentScenario={currentScenario}
+        onSelectScenario={handleSelectScenario}
+      />
 
       {/* Quick Scenario Bar directly under header */}
       <div className="scenario-bar">
@@ -126,7 +152,11 @@ function DashboardLayout() {
 
       <div className="main-body">
         {/* Navigation Sidebar */}
-        <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} />
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={handleTabChange}
+          student={student}
+        />
 
         {/* Content Area */}
         <main className="content-area">
@@ -181,13 +211,27 @@ export default function App() {
         <Route path="/signup" element={<AuthPortal initialTab="signup" />} />
         <Route path="/register" element={<Navigate to="/signup" replace />} />
 
-        {/* Dashboard Routes */}
-        <Route path="/dashboard" element={<DashboardLayout />} />
-        <Route path="/dashboard/:tabParam" element={<DashboardLayout />} />
+        {/* Dashboard Routes - Protected */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/:tabParam"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Default Fallback Route */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Default Fallback Routes */}
+        <Route path="/" element={<RootRedirect />} />
+        <Route path="*" element={<RootRedirect />} />
       </Routes>
     </AppProviders>
   );

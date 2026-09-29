@@ -17,13 +17,29 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const [studentsList, setStudentsList] = useState(STUDENTS);
-  const [selectedStudentId, setSelectedStudentId] = useState("MS-001");
+  const [studentsList, setStudentsList] = useState(() => {
+    const saved = localStorage.getItem("moonSchool_students");
+    try {
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return STUDENTS;
+    } catch {
+      return STUDENTS;
+    }
+  });
+
+  const [selectedStudentId, setSelectedStudentId] = useState(() => {
+    return (
+      localStorage.getItem("moonSchool_selectedStudentId") || "MS-001"
+    );
+  });
 
   // Currently selected student object
   const student = useMemo(() => {
     return (
-      studentsList.find((s) => s.id === selectedStudentId) ||
+      studentsList.find((s) => (s.id || s._id) === selectedStudentId) ||
       studentsList[0] ||
       STUDENTS[0]
     );
@@ -39,7 +55,10 @@ export function AuthProvider({ children }) {
     }
     if (students && students.length > 0) {
       setStudentsList(students);
-      setSelectedStudentId(students[0].id);
+      const firstId = students[0].id || students[0]._id;
+      setSelectedStudentId(firstId);
+      localStorage.setItem("moonSchool_students", JSON.stringify(students));
+      localStorage.setItem("moonSchool_selectedStudentId", firstId);
     }
     setIsAuthenticated(true);
   };
@@ -53,8 +72,12 @@ export function AuthProvider({ children }) {
       localStorage.setItem("moonSchool_token", token);
     }
     if (newStudents && newStudents.length > 0) {
-      setStudentsList((prev) => [...newStudents, ...prev]);
-      setSelectedStudentId(newStudents[0].id);
+      const mergedStudents = [...newStudents, ...studentsList];
+      setStudentsList(mergedStudents);
+      const firstId = newStudents[0].id || newStudents[0]._id;
+      setSelectedStudentId(firstId);
+      localStorage.setItem("moonSchool_students", JSON.stringify(mergedStudents));
+      localStorage.setItem("moonSchool_selectedStudentId", firstId);
     }
     setIsAuthenticated(true);
   };
@@ -62,6 +85,8 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem("moonSchool_token");
     localStorage.removeItem("moonSchool_user");
+    localStorage.removeItem("moonSchool_students");
+    localStorage.removeItem("moonSchool_selectedStudentId");
     setIsAuthenticated(false);
   };
 

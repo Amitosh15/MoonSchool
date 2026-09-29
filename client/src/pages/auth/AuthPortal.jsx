@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { ShieldCheck, LogIn, UserPlus } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context";
@@ -8,7 +9,14 @@ import "./auth.css";
 export default function AuthPortal({ initialTab }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { login, signup } = useAuth();
+  const { isAuthenticated, login, signup } = useAuth();
+
+  // If already authenticated, redirect immediately to dashboard home
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard/home", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   // If path is /signup or /register, default to signup, otherwise login
   const isSignup =
@@ -60,14 +68,14 @@ export default function AuthPortal({ initialTab }) {
           <LoginForm
             onSuccess={(user, token, students) => {
               login(user, token, students);
-              navigate("/");
+              navigate("/dashboard/home", { replace: true });
             }}
           />
         ) : (
           <SignupForm
             onSuccess={(newUser, newStudents, token) => {
               signup(newUser, newStudents, token);
-              navigate("/");
+              navigate("/dashboard/home", { replace: true });
             }}
             onSwitchToLogin={() => navigate("/login")}
           />

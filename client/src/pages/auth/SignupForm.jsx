@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 import {
   User,
   Mail,
@@ -59,15 +59,12 @@ export default function SignupForm({ onSuccess }) {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        {
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          phone: formData.phone.trim(),
-          password: formData.password,
-        },
-      );
+      const response = await api.post("/auth/register", {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        password: formData.password,
+      });
 
       if (response.data && response.data.success) {
         if (onSuccess) {
