@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import lncLogo from "../assets/LNC.png";
 import {
-  ShieldCheck,
   Clock,
   Calendar,
   Bell,
@@ -33,14 +33,18 @@ export default function Header({
       {/* Brand Section */}
       <div className="brand-section">
         <div className="brand-logo-crest">
-          <ShieldCheck size={26} strokeWidth={2.4} />
+          <img
+            src={lncLogo}
+            alt="Lake Norman Charter crest"
+            className="brand-logo-img"
+          />
         </div>
         <div className="brand-titles">
           <h1>
             Lake Norman Charter
             {/* <span className="school-badge">SAFE APP</span> */}
           </h1>
-          <p>Safe Students, Bright Futures</p>
+          <p>Together we learn, lead and serve</p>
         </div>
       </div>
 
@@ -83,7 +87,11 @@ export default function Header({
             <>
               <Calendar size={15} color="#38bdf8" />
               <span>{currentDate}</span>
-              <span style={{ color: "rgba(255, 255, 255, 0.35)", margin: "0 2px" }}>•</span>
+              <span
+                style={{ color: "rgba(255, 255, 255, 0.35)", margin: "0 2px" }}
+              >
+                •
+              </span>
             </>
           )}
           <Clock size={15} color="#38bdf8" />
