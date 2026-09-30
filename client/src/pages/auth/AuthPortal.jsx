@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { ShieldCheck, LogIn, UserPlus } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context";
+import lncLogo from '../../assets/LNC.png'
 import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
 import "./auth.css";
@@ -32,14 +33,17 @@ export default function AuthPortal({ initialTab }) {
         {/* School Name & Crest at Top of Card */}
         <div className="auth-card-brand">
           <div className="auth-logo-crest">
-            <ShieldCheck size={26} strokeWidth={2.4} />
+            <img
+              src={lncLogo}
+              alt="Lake Norman Charter crest"
+              className="brand-logo-img"
+            />
           </div>
           <div className="auth-brand-text">
             <h1>
               Lake Norman Charter
-              <span className="auth-brand-badge-tag">PARENT ACCESS</span>
             </h1>
-            <p>Arrival, Dismissal & Transportation System</p>
+            <p>Together we learn, lead and serve</p>
           </div>
         </div>
 
