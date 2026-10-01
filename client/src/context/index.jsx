@@ -1,6 +1,6 @@
 import { AuthProvider, AuthContext } from "./AuthContext";
 import { DismissalProvider, DismissalContext } from "./DismissalContext";
-import { UIProvider, UIContext } from "./ULContext";
+import { UIProvider, UIContext } from "./UIContext";
 import { useAuth } from "./useAuth";
 import { useDismissal } from "./useDismissal";
 import { useUI } from "./useUI";

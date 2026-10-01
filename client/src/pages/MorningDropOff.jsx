@@ -18,22 +18,40 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import confetti from "canvas-confetti";
+import { useAuth, useDismissal, useUI } from "../context";
 
 export default function MorningDropOff({
-  student,
-  studentsList,
-  onSelectStudent,
-  parentUser,
-  currentTime,
-  currentDate,
-  isLateMorning,
-  dropOffStatus,
-  onConfirmDropOff,
-  onCheckInLate,
-  onOpenCarTag,
-  selectedLane,
-  setSelectedLane,
+  student: propStudent,
+  studentsList: propStudentsList,
+  onSelectStudent: propOnSelectStudent,
+  parentUser: propParentUser,
+  currentTime: propCurrentTime,
+  isLateMorning: propIsLateMorning,
+  dropOffStatus: propDropOffStatus,
+  onConfirmDropOff: propOnConfirmDropOff,
+  onCheckInLate: propOnCheckInLate,
+  onOpenCarTag: propOnOpenCarTag,
+  selectedLane: propSelectedLane,
+  setSelectedLane: propSetSelectedLane,
 }) {
+  const auth = useAuth();
+  const dismissal = useDismissal();
+  const ui = useUI();
+
+  const student = propStudent ?? auth.student;
+  const studentsList = propStudentsList ?? auth.studentsList;
+  const onSelectStudent = propOnSelectStudent ?? auth.setSelectedStudentId;
+  const parentUser = propParentUser ?? auth.parentUser;
+  const currentTime = propCurrentTime ?? dismissal.currentTime;
+  const isLateMorning = propIsLateMorning ?? dismissal.isLateMorning;
+  const dropOffStatus = propDropOffStatus ?? dismissal.dropOffStatus;
+  const onConfirmDropOff =
+    propOnConfirmDropOff ?? dismissal.handleConfirmDropOff;
+  const onCheckInLate = propOnCheckInLate ?? dismissal.handleCheckInLate;
+  const onOpenCarTag = propOnOpenCarTag ?? ui.openCarTag;
+  const selectedLane = propSelectedLane ?? dismissal.selectedLane;
+  const setSelectedLane = propSetSelectedLane ?? dismissal.setSelectedLane;
+
   const [transporterType, setTransporterType] = useState("Parent");
   const [thirdPartyName, setThirdPartyName] = useState("");
   const [thirdPartyRelation, setThirdPartyRelation] = useState("Nanny");
@@ -287,7 +305,7 @@ export default function MorningDropOff({
                   fontWeight: 800,
                 }}
               >
-                {currentDate ? `${currentDate} • ${currentTime}` : currentTime}
+                {currentTime}
               </span>
             </div>
 
@@ -446,6 +464,13 @@ export default function MorningDropOff({
                     </div>
                   </div>
                 </div>
+                <button
+                  className="pill-status-btn"
+                  onClick={() => setShowReceiptModal(true)}
+                  style={{ fontSize: "0.8rem", padding: "6px 12px" }}
+                >
+                  View Receipt
+                </button>
               </div>
             ) : (
               <button

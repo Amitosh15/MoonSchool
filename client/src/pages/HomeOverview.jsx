@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { PARENT_USER, STUDENTS } from "../data/mocData";
 
-export default function Home({
+export default function HomeOverview({
   student,
   parentUser,
   currentTime,
@@ -360,7 +360,9 @@ export default function Home({
               <span>
                 Timestamp:{" "}
                 <strong>
-                  {currentDate ? `${currentDate} • ${currentTime}` : currentTime || "8:02 AM"}
+                  {currentDate
+                    ? `${currentDate} • ${currentTime}`
+                    : currentTime || "8:02 AM"}
                 </strong>
               </span>
             </div>

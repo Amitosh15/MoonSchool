@@ -1,5 +1,5 @@
 import React from "react";
-// import CarTagModal from "./CarTagModal";
+import CarTagModal from "../pages/CarTagModal";
 // import TeacherScanModal from "./TeacherScanModal";
 // import BusTrackingModal from "./BusTrackingModal";
 // import PaymentsModal from "./PaymentsModal";
@@ -33,27 +33,27 @@ export default function AppModals() {
         onLaunchTeacherScan={openTeacherScan}
       />
 
-      <TeacherScanModal
+      {/* <TeacherScanModal
         isOpen={isTeacherScanOpen}
         onClose={closeTeacherScan}
         student={student}
         parentUser={parentUser}
         onStudentReleased={handleConfirmPickUp}
-      />
+      /> */}
 
-      <BusTrackingModal
+      {/* <BusTrackingModal
         isOpen={isBusTrackingOpen}
         onClose={closeBusTracking}
         student={student}
         parentUser={parentUser}
-      />
+      /> */}
 
-      <PaymentsModal
+      {/* <PaymentsModal
         isOpen={isPaymentsOpen}
         onClose={closePayments}
         lateFeeTotal={lateFeeTotal}
         parentUser={parentUser}
-      />
+      /> */}
 
       <NotificationsModal
         isOpen={isNotificationsOpen}

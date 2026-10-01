@@ -10,72 +10,25 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import MorningDropOff from "./pages/MorningDropOff";
 import AfternoonPickUp from "./pages/AfternoonPickUp";
-import Home from "./pages/Home";
+import HomeOverview from "./pages/HomeOverview";
 import AuthPortal from "./pages/auth/AuthPortal";
-import { AppProviders, useAuth, useDismissal, useUI } from "./context";
-
-function MyChildrenView() {
-  return (
-    <div style={{ padding: "24px", color: "#e2e8f0" }}>
-      My Children view is coming soon.
-    </div>
-  );
-}
-
-function ActivityHistory() {
-  return (
-    <div style={{ padding: "24px", color: "#e2e8f0" }}>
-      Activity History is coming soon.
-    </div>
-  );
-}
-
-function HelpView() {
-  return (
-    <div style={{ padding: "24px", color: "#e2e8f0" }}>
-      Help &amp; Safety Policy is coming soon.
-    </div>
-  );
-}
-
-// Protected Route component: Redirects unauthenticated users to /login
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-}
-
-// Root redirect: Send authenticated users to /dashboard/home, unauthenticated to /login
-function RootRedirect() {
-  const { isAuthenticated } = useAuth();
-  return (
-    <Navigate to={isAuthenticated ? "/dashboard/home" : "/login"} replace />
-  );
-}
+import { AppProviders, useDismissal, useUI } from "./context";
+import AppModals from "./components/AppModals";
 
 // Dashboard layout component that syncs active tab with URL and context
 function DashboardLayout() {
   const { tabParam } = useParams();
   const navigate = useNavigate();
-  const activeTab = tabParam || "home";
+  const activeTab = tabParam || "dropoff";
 
-  const { student, studentsList, setSelectedStudentId, parentUser, logout } =
-    useAuth();
+  const { currentScenario, handleSelectScenario } = useDismissal();
   const {
-    currentScenario,
-    currentDate,
-    currentTime,
-    isLateMorning,
-    dropOffStatus,
-    selectedLane,
-    setSelectedLane,
-    handleSelectScenario,
-    handleConfirmDropOff,
-    handleCheckInLate,
-  } = useDismissal();
-  const { openCarTag, openBusTracking, openPayments } = useUI();
+    openCarTag,
+    openBusTracking,
+    openPayments,
+    openNotifications,
+    unreadNotifications,
+  } = useUI();
 
   const handleTabChange = (tab) => {
     if (tab === "bus") {
@@ -93,12 +46,8 @@ function DashboardLayout() {
       <Header
         activeTab={activeTab}
         setActiveTab={handleTabChange}
-        currentTime={currentTime}
-        currentDate={currentDate}
-        parentUser={parentUser}
-        onLogout={logout}
-        currentScenario={currentScenario}
-        onSelectScenario={handleSelectScenario}
+        onOpenNotifications={openNotifications}
+        unreadNotifications={unreadNotifications}
       />
 
       {/* Quick Scenario Bar directly under header */}
@@ -154,45 +103,17 @@ function DashboardLayout() {
 
       <div className="main-body">
         {/* Navigation Sidebar */}
-        <Sidebar
-          activeTab={activeTab}
-          setActiveTab={handleTabChange}
-          student={student}
-        />
+        <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} />
 
         {/* Content Area */}
         <main className="content-area">
           {activeTab === "home" && (
-            <Home
-              student={student}
-              parentUser={parentUser}
-              currentTime={currentTime}
-              currentDate={currentDate}
+            <HomeOverview
               onNavigate={handleTabChange}
-              dropOffStatus={dropOffStatus}
-              pickUpStatus={null}
               onOpenCarTag={openCarTag}
-              onOpenTeacherScan={() => {}}
-              lateFeeTotal={0}
             />
           )}
-          {activeTab === "dropoff" && (
-            <MorningDropOff
-              student={student}
-              studentsList={studentsList}
-              onSelectStudent={setSelectedStudentId}
-              parentUser={parentUser}
-              currentTime={currentTime}
-              currentDate={currentDate}
-              isLateMorning={isLateMorning}
-              dropOffStatus={dropOffStatus}
-              onConfirmDropOff={handleConfirmDropOff}
-              onCheckInLate={handleCheckInLate}
-              onOpenCarTag={openCarTag}
-              selectedLane={selectedLane}
-              setSelectedLane={setSelectedLane}
-            />
-          )}
+          {activeTab === "dropoff" && <MorningDropOff />}
           {activeTab === "pickup" && <AfternoonPickUp />}
           {activeTab === "children" && <MyChildrenView />}
           {activeTab === "history" && <ActivityHistory />}
@@ -201,7 +122,7 @@ function DashboardLayout() {
       </div>
 
       {/* All Application Modals Connected via Context */}
-      {/* <AppModals /> */}
+      <AppModals />
     </div>
   );
 }
@@ -215,27 +136,13 @@ export default function App() {
         <Route path="/signup" element={<AuthPortal initialTab="signup" />} />
         <Route path="/register" element={<Navigate to="/signup" replace />} />
 
-        {/* Dashboard Routes - Protected */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/:tabParam"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        />
+        {/* Dashboard Routes */}
+        <Route path="/dashboard" element={<DashboardLayout />} />
+        <Route path="/dashboard/:tabParam" element={<DashboardLayout />} />
 
-        {/* Default Fallback Routes */}
-        <Route path="/" element={<RootRedirect />} />
-        <Route path="*" element={<RootRedirect />} />
+        {/* Default Fallback Route */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </AppProviders>
   );
