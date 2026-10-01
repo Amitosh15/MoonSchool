@@ -12,7 +12,7 @@ import MorningDropOff from "./pages/MorningDropOff";
 import AfternoonPickUp from "./pages/AfternoonPickUp";
 import HomeOverview from "./pages/HomeOverview";
 import AuthPortal from "./pages/auth/AuthPortal";
-import { AppProviders, useDismissal, useUI } from "./context";
+import { AppProviders, useAuth, useDismissal, useUI } from "./context";
 import AppModals from "./components/AppModals";
 
 // Dashboard layout component that syncs active tab with URL and context
@@ -20,6 +20,7 @@ function DashboardLayout() {
   const { tabParam } = useParams();
   const navigate = useNavigate();
   const activeTab = tabParam || "dropoff";
+  const { parentUser, logout } = useAuth();
 
   const { currentScenario, handleSelectScenario } = useDismissal();
   const {
@@ -48,6 +49,8 @@ function DashboardLayout() {
         setActiveTab={handleTabChange}
         onOpenNotifications={openNotifications}
         unreadNotifications={unreadNotifications}
+        parentUser={parentUser}
+        onLogout={logout}
       />
 
       {/* Quick Scenario Bar directly under header */}
