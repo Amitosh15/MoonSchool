@@ -45,8 +45,7 @@ export default function MorningDropOff({
   const currentTime = propCurrentTime ?? dismissal.currentTime;
   const isLateMorning = propIsLateMorning ?? dismissal.isLateMorning;
   const dropOffStatus = propDropOffStatus ?? dismissal.dropOffStatus;
-  const onConfirmDropOff =
-    propOnConfirmDropOff ?? dismissal.handleConfirmDropOff;
+  const onConfirmDropOff = propOnConfirmDropOff ?? dismissal.handleConfirmDropOff;
   const onCheckInLate = propOnCheckInLate ?? dismissal.handleCheckInLate;
   const onOpenCarTag = propOnOpenCarTag ?? ui.openCarTag;
   const selectedLane = propSelectedLane ?? dismissal.selectedLane;
@@ -255,7 +254,7 @@ export default function MorningDropOff({
               <span className="status-step-label">2. At School</span>
               <div className="status-step-val">
                 {dropOffStatus === "confirmed" ||
-                dropOffStatus === "late_checked_in" ? (
+                  dropOffStatus === "late_checked_in" ? (
                   <>
                     <span className="status-pulse-dot green" />
                     <span style={{ color: "#0284c7" }}>In Class (Safe)</span>
@@ -263,13 +262,6 @@ export default function MorningDropOff({
                 ) : (
                   <span style={{ color: "#94a3b8" }}>Pending Arrival</span>
                 )}
-              </div>
-            </div>
-
-            <div className="status-step-box">
-              <span className="status-step-label">3. Afternoon Pick-Up</span>
-              <div className="status-step-val">
-                <span style={{ color: "#94a3b8" }}>Opens 3:30 PM</span>
               </div>
             </div>
           </div>

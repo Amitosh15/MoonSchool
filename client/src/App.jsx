@@ -11,9 +11,13 @@ import Sidebar from "./components/Sidebar";
 import MorningDropOff from "./pages/MorningDropOff";
 import AfternoonPickUp from "./pages/AfternoonPickUp";
 import HomeOverview from "./pages/HomeOverview";
+import MyChildrenView from "./pages/MyChildrenView";
+import ActivityHistory from "./pages/ActivityHistory";
+import HelpView from "./pages/HelpView"
 import AuthPortal from "./pages/auth/AuthPortal";
 import { AppProviders, useAuth, useDismissal, useUI } from "./context";
 import AppModals from "./components/AppModals";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 // Dashboard layout component that syncs active tab with URL and context
 function DashboardLayout() {
@@ -53,57 +57,6 @@ function DashboardLayout() {
         onLogout={logout}
       />
 
-      {/* Quick Scenario Bar directly under header */}
-      <div className="scenario-bar">
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span
-            style={{
-              fontWeight: 800,
-              color: "#f4a261",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}
-          >
-            System Time & Stage:
-          </span>
-          <span style={{ color: "#cbd5e1" }}>
-            Select scenario to preview each workflow:
-          </span>
-        </div>
-        <div className="scenario-buttons-group">
-          <button
-            className={`scenario-chip ${currentScenario === "morning_regular" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("morning_regular")}
-          >
-            <span>☀️ Morning On-Time (8:02 AM)</span>
-          </button>
-          <button
-            className={`scenario-chip ${currentScenario === "morning_late" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("morning_late")}
-          >
-            <span>⚠️ Morning Late (8:35 AM)</span>
-          </button>
-          <button
-            className={`scenario-chip ${currentScenario === "afternoon_queue" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("afternoon_queue")}
-          >
-            <span>🚗 Afternoon Queue (3:15 PM)</span>
-          </button>
-          <button
-            className={`scenario-chip ${currentScenario === "afternoon_open" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("afternoon_open")}
-          >
-            <span>🏁 Gate Open & Pole 7 (3:35 PM)</span>
-          </button>
-          <button
-            className={`scenario-chip late ${currentScenario === "afternoon_late" ? "active" : ""}`}
-            onClick={() => handleSelectScenario("afternoon_late")}
-          >
-            <span>🚨 Late Fee $1/min (4:08 PM)</span>
-          </button>
-        </div>
-      </div>
-
       <div className="main-body">
         {/* Navigation Sidebar */}
         <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} />
@@ -139,9 +92,14 @@ export default function App() {
         <Route path="/signup" element={<AuthPortal initialTab="signup" />} />
         <Route path="/register" element={<Navigate to="/signup" replace />} />
 
-        {/* Dashboard Routes */}
+        {/* Parent Dashboard Routes */}
         <Route path="/dashboard" element={<DashboardLayout />} />
         <Route path="/dashboard/:tabParam" element={<DashboardLayout />} />
+
+        {/* Admin Command Center Dashboard Routes */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/:tabParam" element={<AdminDashboard />} />
 
         {/* Default Fallback Route */}
         <Route path="/" element={<Navigate to="/login" replace />} />

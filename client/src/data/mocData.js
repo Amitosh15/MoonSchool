@@ -2,9 +2,9 @@
 export const STUDENTS = [
   {
     id: "MS-001",
-    name: "Ama",
+    name: "Emma",
     grade: "Grade 2",
-    homeroom: "Gr. 2A",
+    homeroom: "Homeroom 2A",
     teacher: "Ms. Higgins",
     avatar:
       "https://images.unsplash.com/photo-1544717305-2782549b5136?w=200&auto=format&fit=crop&q=80",
@@ -15,9 +15,9 @@ export const STUDENTS = [
   },
   {
     id: "MS-002",
-    name: "Kwame",
+    name: "Sophia",
     grade: "Grade 4",
-    homeroom: "Gr. 4B",
+    homeroom: "Homeroom. 4B",
     teacher: "Mr. Adams",
     avatar:
       "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=200&auto=format&fit=crop&q=80",

@@ -15,11 +15,12 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { PARENT_USER, STUDENTS } from "../data/mocData";
+import { useAuth, useDismissal, useUI } from "../context";
 
 export default function HomeOverview({
   student,
   parentUser,
-  currentTime,
+  currentTime: propCurrentTime,
   currentDate,
   onNavigate,
   dropOffStatus,
@@ -30,6 +31,12 @@ export default function HomeOverview({
 }) {
   const safeStudent = student || STUDENTS[0];
   const safeParentUser = parentUser || PARENT_USER;
+
+  const auth = useAuth();
+  const dismissal = useDismissal();
+  const ui = useUI();
+
+  const currentTime = propCurrentTime ?? dismissal.currentTime;
 
   // Status overrides for interactive toggling
   const [statusOverrides, setStatusOverrides] = useState({

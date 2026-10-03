@@ -13,6 +13,16 @@ export const formatLiveDate = (date = new Date()) => {
   return `${day}/${month}/${year}`;
 };
 
+// Formats full friendly date (e.g. Sat, Oct 3, 2026)
+export const formatFullLiveDate = (date = new Date()) => {
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 // Formats time live without seconds (e.g. 06:35 PM)
 export const formatLiveTime = (date = new Date()) => {
   const hours = date.getHours();
@@ -27,8 +37,9 @@ export function DismissalProvider({ children }) {
   const navigate = useNavigate();
   const { student, parentUser } = useAuth();
 
-  // Live Date (DD/MM/YYYY) & Time (live without seconds)
+  // Live Date (DD/MM/YYYY), Formatted Date & Time (live without seconds)
   const [currentDate, setCurrentDate] = useState(() => formatLiveDate());
+  const [formattedDate, setFormattedDate] = useState(() => formatFullLiveDate());
   const [currentTime, setCurrentTime] = useState(() => formatLiveTime());
 
   // Continuously update live clock and date
@@ -36,6 +47,7 @@ export function DismissalProvider({ children }) {
     const updateLiveClock = () => {
       const now = new Date();
       setCurrentDate(formatLiveDate(now));
+      setFormattedDate(formatFullLiveDate(now));
       setCurrentTime(formatLiveTime(now));
     };
 
@@ -192,6 +204,8 @@ export function DismissalProvider({ children }) {
     setCurrentScenario,
     currentDate,
     setCurrentDate,
+    formattedDate,
+    setFormattedDate,
     currentTime,
     setCurrentTime,
     isLateMorning,

@@ -11,12 +11,13 @@ import {
   AlertTriangle,
   LogOut,
   KeyRound,
+  LayoutDashboard,
 } from "lucide-react";
-
+import { useAuth, useDismissal, useUI } from "../context";
 export default function Header({
   currentScenario,
   onSelectScenario,
-  currentTime,
+  currentTime: propCurrentTime,
   currentDate,
   activeTab,
   setActiveTab,
@@ -28,6 +29,12 @@ export default function Header({
 }) {
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const auth = useAuth();
+  const dismissal = useDismissal();
+  const ui = useUI();
+
+  const currentTime = propCurrentTime ?? dismissal.currentTime;
   return (
     <header className="top-header">
       {/* Brand Section */}
@@ -47,35 +54,6 @@ export default function Header({
           <p>Together we learn, lead and serve</p>
         </div>
       </div>
-
-      {/* Center Nav / Scenario Test Switcher */}
-      {/* <div className="header-center-nav">
-        <div className="simulation-banner-pill">
-          <Sparkles size={14} className="text-amber-400" />
-          <span>Demo Scenario:</span>
-          <select
-            className="sim-select"
-            value={currentScenario}
-            onChange={(e) => onSelectScenario(e.target.value)}
-          >
-            <option value="morning_regular">
-              Morning Drop-Off (8:02 AM - Normal)
-            </option>
-            <option value="morning_late">
-              Morning Late Arrival (8:35 AM - Lobby Check-In)
-            </option>
-            <option value="afternoon_queue">
-              Afternoon Pick-Up Queue (3:15 PM - Queueing)
-            </option>
-            <option value="afternoon_open">
-              Afternoon Gate Open (3:35 PM - Pole 7 Staged)
-            </option>
-            <option value="afternoon_late">
-              Afternoon Late Pick-Up (4:08 PM - $1/min Fee)
-            </option>
-          </select>
-        </div>
-      </div> */}
 
       {/* User & Time Controls */}
       <div className="header-user-section">
@@ -108,6 +86,30 @@ export default function Header({
           {unreadNotifications > 0 && <span className="badge-dot" />}
         </button>
 
+        {/* Admin Command Center Quick Button */}
+        <button
+          onClick={() => navigate("/admin")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "6px 12px",
+            background:
+              "linear-gradient(135deg, rgba(0, 168, 150, 0.2), rgba(56, 189, 248, 0.2))",
+            border: "1px solid rgba(56, 189, 248, 0.4)",
+            borderRadius: "10px",
+            color: "#38bdf8",
+            fontSize: "0.78rem",
+            fontWeight: 700,
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+          }}
+          title="Open Moon School Admin Command Center"
+        >
+          <LayoutDashboard size={14} />
+          <span>Admin Portal</span>
+        </button>
+
         {/* User Profile Pill with Dropdown / Logout */}
         <div style={{ position: "relative" }}>
           <div
@@ -119,10 +121,10 @@ export default function Header({
             <div className="user-avatar-circle">
               {parentUser?.name
                 ? parentUser.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .slice(0, 2)
-                    .join("")
+                  .split(" ")
+                  .map((n) => n[0])
+                  .slice(0, 2)
+                  .join("")
                 : "P"}
             </div>
             <div className="user-name-role">
@@ -176,16 +178,6 @@ export default function Header({
                 >
                   {parentUser?.email || "parent@example.com"}
                 </div>
-                <div
-                  style={{
-                    fontSize: "0.72rem",
-                    color: "#00a896",
-                    marginTop: "2px",
-                    fontWeight: 600,
-                  }}
-                >
-                  Vehicle: {parentUser?.vehicle || "Registered"}
-                </div>
               </div>
 
               <div
@@ -196,32 +188,6 @@ export default function Header({
                   gap: "4px",
                 }}
               >
-                <button
-                  onClick={() => {
-                    setShowProfileMenu(false);
-                    if (onOpenAuth) onOpenAuth();
-                    navigate("/login");
-                  }}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "8px 10px",
-                    fontSize: "0.82rem",
-                    color: "#cbd5e1",
-                    borderRadius: "8px",
-                    textAlign: "left",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.target.style.background = "rgba(255,255,255,0.08)")
-                  }
-                  onMouseLeave={(e) => (e.target.style.background = "none")}
-                >
-                  <KeyRound size={16} color="#38bdf8" />
-                  <span>View Auth / Sign In Page</span>
-                </button>
-
                 <button
                   onClick={() => {
                     setShowProfileMenu(false);
